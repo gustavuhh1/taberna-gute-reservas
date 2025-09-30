@@ -1,37 +1,40 @@
 "use client";
 
-import Image from "next/image";
 import Header from "../components/common/header";
 import { Button } from "@/components/ui/button";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Card, CardContent } from "@/components/ui/card";
 import Footer from "@/components/common/footer";
 import About from "@/components/common/about";
 import Galery from "@/components/common/galery";
+import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
 
 export default function Home() {
+  const session = authClient.useSession();
   return (
     <>
       <Header />
       <div className="full-w h-full flex flex-col justify-center">
-        <main className="px-5 py-5 space-y-8 bg-[url('/card_navbar.png')] bg-cover bg-center inset-shadow-[250px_0px_125px_-3px_rgba(0,0,0,0.7)]">
-          <h1 className="text-4xl md:text-5xl font-bold font-titulo">Taberna do Gute</h1>
-          <p>Uma experiência única de culinária alemã com toques brasileiros</p>
-          <p>
+        <main className="px-5 py-12 space-y-8 bg-[url('/card_navbar.png')] bg-cover bg-center inset-shadow-[320px_0px_140px_-3px_rgba(0,0,20,0.9)]">
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight font-titulo">
+            Taberna do Gute
+          </h1>
+          <p className="text-2xl md:text-3xl text-orange-300 font-medium mb-6 font-titulo">
+            Uma experiência única de culinária alemã com toques brasileiros
+          </p>
+          <p className="text-white/80 mb-10 text-lg">
             Localizado em Horizonte, Ceará, nosso restaurante oferece um ambiente
             aconchegante e uma gastronomia única, com pratos elaborados pelo Chef Artur
             Schmidt.
           </p>
           <div className="flex flex-col max-w-[180px] gap-3">
-            <Button size="xl" className="font-medium text-md text-black bg-amber-200">
-              Reservar Mesa
-            </Button>
+            <Link href={session.data ? "/" : "/authentication"}>
+              <Button
+                size="xl"
+                className="w-full font-medium text-md text-black bg-amber-200"
+              >
+                Reservar Mesa
+              </Button>
+            </Link>
             <Button
               variant="ghost"
               size="xl"

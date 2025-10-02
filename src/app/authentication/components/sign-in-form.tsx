@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -25,7 +24,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
-import SocialButtons from "./social-buttons";
 
 const formSchema = z.object({
   email: z.email({ error: "E-mail inválido." }),
@@ -46,7 +44,7 @@ const SignInForm = () => {
   });
 
   const handleSignInWithGoogle = async () => {
-    const { data } = await authClient.signIn.social({
+    await authClient.signIn.social({
       provider: "google",
     });
   };

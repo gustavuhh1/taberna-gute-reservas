@@ -10,7 +10,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { FormsReserve } from "./forms-reserve";
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "../ui/sheet";
 import { Button } from "../ui/button";
 import {
   ClipboardClockIcon,
@@ -22,14 +29,15 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
+import Image from "next/image";
 
 const Header = () => {
   const { data: session } = authClient.useSession();
 
   return (
-    <header className="flex justify-between p-5 bg-indigo-950 text-white">
+    <header className="flex justify-between items-center p-5 bg-indigo-950 text-white">
       <Link href={"/"}>
-        <h1>Taberna do Gute</h1>
+        <Image src={"/logo.jpg"} width={46} height={46} alt={"Logo Taberna do Gute"} className="rounded-full"/>
       </Link>
 
       <nav className="">
@@ -76,9 +84,9 @@ const Header = () => {
                     </div>
                     <Separator />
                     <div className="">
-                      <Link href={"/minhas-reservas"} className="flex gap-5 py-3 px-2">
+                      <Link href={"/reservas"} className="flex gap-5 py-3 px-2">
                         <ClipboardClockIcon />
-                        Reservas
+                        Minhas reservas
                       </Link>
                       <Separator />
                       <div className="flex flex-col">
@@ -87,7 +95,7 @@ const Header = () => {
                           Meu perfil
                         </Link>
                       </div>
-                      <Separator/>
+                      <Separator />
                     </div>
                   </div>
                 ) : (
@@ -100,6 +108,9 @@ const Header = () => {
                     </Button>
                   </div>
                 )}
+              </div>
+              <div className="mx-auto mt-auto pb-3">
+                <p className="text-sm font-light">powered by Taberna do Gute©</p>
               </div>
             </SheetContent>
           </Sheet>

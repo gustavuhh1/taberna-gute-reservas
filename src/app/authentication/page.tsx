@@ -6,8 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function Authentication() {
   return (
     <>
-      <Header />
-      <div className="flex w-full flex-col gap-6 p-5 md:max-w-md md:mx-auto">
+      <div className="flex w-full flex-col gap-6 p-5 md:max-w-md md:mx-auto justify-center">
         <Tabs defaultValue="sign-in" className="">
           <TabsList>
             <TabsTrigger value="sign-in">Entrar</TabsTrigger>

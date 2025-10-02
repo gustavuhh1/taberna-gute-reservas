@@ -1,18 +1,19 @@
 "use client";
 
-import Header from "../components/common/header";
 import { Button } from "@/components/ui/button";
 import Footer from "@/components/common/footer";
 import About from "@/components/common/about";
 import Galery from "@/components/common/galery";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const session = authClient.useSession();
+  const router = useRouter();
   return (
     <>
-      <Header />
       <div className="full-w h-full flex flex-col justify-center">
         <main className="px-5 py-12 space-y-8 bg-[url('/card_navbar.png')] bg-cover bg-center inset-shadow-[320px_0px_140px_-3px_rgba(0,0,20,0.9)]">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight font-titulo">
@@ -27,7 +28,14 @@ export default function Home() {
             Schmidt.
           </p>
           <div className="flex flex-col max-w-[180px] gap-3">
-            <Link href={session.data ? "/" : "/authentication"}>
+            <Link
+              href={session.data ? "/" : "/authentication"}
+              onClick={
+                session.data
+                  ? () => {router.push("/reservas")}
+                  : () => toast.warning("Se autentique antes de realizar uma reserva!")
+              }
+            >
               <Button
                 size="xl"
                 className="w-full font-medium text-md text-black bg-amber-200"

@@ -5,7 +5,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -63,7 +62,7 @@ const SignUpForm = () => {
   });
 
   const handleSignInWithGoogle = async () => {
-    const { data } = await authClient.signIn.social({
+    await authClient.signIn.social({
       provider: "google",
     });
   };

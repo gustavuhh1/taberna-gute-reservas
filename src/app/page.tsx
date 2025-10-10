@@ -29,7 +29,7 @@ export default function Home() {
           </p>
           <div className="flex flex-col max-w-[180px] gap-3">
             <Link
-              href={session.data ? "/" : "/authentication"}
+              href={session.data ? "/reservas" : "/authentication"}
               onClick={
                 session.data
                   ? () => {router.push("/reservas")}

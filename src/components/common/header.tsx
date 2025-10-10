@@ -44,7 +44,7 @@ const Header = () => {
         <ul className="gap-5 flex items-center justify-center">
           <Sheet>
             <SheetTrigger asChild={true}>
-              <Button className="border-2" variant="ghost" size="sm">
+              <Button className="border-2" variant="ghost" size="icon">
                 <MenuIcon />
               </Button>
             </SheetTrigger>

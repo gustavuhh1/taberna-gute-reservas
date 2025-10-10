@@ -79,7 +79,7 @@ model Reserva {
   quantidadePessoas Int
   possuiPet         Boolean       @default(false)
   observacoes       String?
-  status            StatusReserva @default(ATIVO)
+  status            StatusReserva @default(PENDENTE)
 
   // Relação correta com o modelo User gerado
   userId String
@@ -92,7 +92,7 @@ model Reserva {
 }
 
 enum StatusReserva {
-  ATIVO
+  ACEITO
   CONCLUIDO
   PENDENTE
   CANCELADO

@@ -18,51 +18,97 @@ import {
 } from "@/components/ui/hover-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { authClient } from "@/lib/auth-client";
-import { format } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 
+interface UserProps {
+  user: {
+    email: string;
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    emailVerified: boolean;
+    name: string;
+    image: string | null;
+    role: string | null;
+  };
+}
+
+interface UpdateProfilePayload {
+  name?: string;
+  image?: string; // pode ser URL externa ou base64
+  currentPassword?: string;
+  newPassword?: string;
+}
+
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  const [nome, setNome] = useState(session?.user.name);
+
+  const [nome, setNome] = useState(user?.name ?? "");
   const [imagePreview, setImagePreview] = useState(user?.image ?? "");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async () => {
+      const payload: UpdateProfilePayload = {
+        name: nome,
+        image: imagePreview, // pode ser URL ou base64
+        ...(currentPassword && newPassword ? { currentPassword, newPassword } : {}),
+      };
+
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Erro ao atualizar perfil");
+      }
+
+      return res.json();
+    },
+    onSuccess: (data: UserProps) => {
+      toast.success("Perfil atualizado com sucesso!");
+      setCurrentPassword("");
+      setNewPassword("");
+      setImagePreview(data.user.image ?? imagePreview);
+      setNome(data.user.name ?? nome);
+      setIsEditing(false);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      toast.error(err.message);
+    },
+  });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result as string);
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+    setImageFile(file);
+
+    const reader = new FileReader();
+    reader.onloadend = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
-  const handleUpload = async () => {
-    if (!imageFile) return toast.error("Selecione uma imagem primeiro!");
-
-    const formData = new FormData();
-    formData.append("file", imageFile);
-
-    const res = await fetch("/api/profile/image", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (res.ok) {
-      toast.success("Imagem atualizada com sucesso!");
-      setImageFile(null);
-    } else {
-      toast.error("Erro ao atualizar imagem.");
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfileMutation.mutate();
   };
 
   return (
@@ -111,9 +157,11 @@ const ProfilePage = () => {
           </CardAction>
         </CardHeader>
         <CardContent className="px-5">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
+                {/* CAMPO NOME */}
+
                 <Label htmlFor="name">Nome</Label>
                 <Input
                   readOnly={!isEditing}
@@ -127,7 +175,7 @@ const ProfilePage = () => {
               <div className="grid gap-2">
                 <div className="flex justify-between">
                   <Label htmlFor="email">Email</Label>
-                  {!user?.emailVerified ? (
+                  {user?.emailVerified ? (
                     <HoverCard>
                       <HoverCardTrigger asChild>
                         <Button variant="link" className="text-green-600 font-semibold">
@@ -191,6 +239,7 @@ const ProfilePage = () => {
                     </HoverCard>
                   )}
                 </div>
+                {/* CAMPO EMAIL */}
                 <Input
                   readOnly
                   value={user?.email}
@@ -202,27 +251,48 @@ const ProfilePage = () => {
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Senha</Label>
+                  <Label htmlFor="current-password">Senha atual</Label>
                 </div>
                 <Input
                   disabled={!isEditing}
-                  value={"*********"}
-                  id="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="************"
+                  id="current-password"
                   type="password"
                   required
+                />
+              </div>
+              <div className="grid gap-2">
+                <div className="flex items-center">
+                  <Label htmlFor="new-password">Nova senha</Label>
+                </div>
+                <Input
+                  disabled={!isEditing}
+                  value={newPassword}
+                  placeholder="************"
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  id="new-password"
+                  type="password"
                 />
               </div>
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2 mb-5">
-          <Button disabled={!isEditing} type="submit" className="w-full">
-            Salvar alterações
+          <Button
+            disabled={!isEditing || updateProfileMutation.status === "pending"}
+            onClick={handleSubmit}
+            className="w-full"
+          >
+            {updateProfileMutation.status === "pending"
+              ? "Salvando..."
+              : "Salvar alterações"}
           </Button>
         </CardFooter>
       </Card>
     </div>
   );
-}
+};
 
 export default ProfilePage;

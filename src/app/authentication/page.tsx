@@ -1,4 +1,3 @@
-import Header from "@/components/common/header";
 import SignUpForm from "./components/sign-up-form";
 import SignInForm from "./components/sign-in-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

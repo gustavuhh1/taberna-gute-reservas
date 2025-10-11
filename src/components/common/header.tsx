@@ -30,19 +30,29 @@ import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const Header = () => {
   const { data: session } = authClient.useSession();
+  const router = useRouter();
+  const [sheet, setSheet] = useState(false)
 
   return (
     <header className="flex justify-between items-center p-5 bg-indigo-950 text-white">
       <Link href={"/"}>
-        <Image src={"/logo.jpg"} width={46} height={46} alt={"Logo Taberna do Gute"} className="rounded-full"/>
+        <Image
+          src={"/logo.jpg"}
+          width={46}
+          height={46}
+          alt={"Logo Taberna do Gute"}
+          className="rounded-full"
+        />
       </Link>
 
       <nav className="">
         <ul className="gap-5 flex items-center justify-center">
-          <Sheet>
+          <Sheet open={sheet} onOpenChange={setSheet}>
             <SheetTrigger asChild={true}>
               <Button className="border-2" variant="ghost" size="icon">
                 <MenuIcon />
@@ -77,7 +87,11 @@ const Header = () => {
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => authClient.signOut()}
+                        onClick={() => {
+                          authClient.signOut();
+                          setSheet(false);
+                          router.replace("/authentication");
+                        }}
                       >
                         <LogOutIcon />
                       </Button>
@@ -101,10 +115,15 @@ const Header = () => {
                 ) : (
                   <div className="flex items-center justify-between">
                     <h2 className="font-semibold">Olá. Faça seu login!</h2>
-                    <Button size="icon" asChild variant="outline">
-                      <Link href="/authentication">
-                        <LogInIcon />
-                      </Link>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => {
+                        setSheet(false);
+                        router.replace("/authentication");
+                      }}
+                    >
+                      <LogInIcon />
                     </Button>
                   </div>
                 )}

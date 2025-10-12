@@ -20,10 +20,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { authClient } from "@/lib/auth-client";
-import { useMutation } from "@tanstack/react-query";
-import { AlertCircle } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { AlertCircle, AlertCircleIcon } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface UserProps {
@@ -41,9 +41,10 @@ interface UserProps {
 
 interface UpdateProfilePayload {
   name?: string;
-  image?: string; // pode ser URL externa ou base64
+  image?: string;
   currentPassword?: string;
   newPassword?: string;
+  firstPassword?: string;
 }
 
 const ProfilePage = () => {
@@ -51,13 +52,32 @@ const ProfilePage = () => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  const [nome, setNome] = useState(user?.name ?? "");
+  const [nome, setNome] = useState(user?.name);
   const [imagePreview, setImagePreview] = useState(user?.image ?? "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [firstPassword, setFirstPassword] = useState("");
+
+  useEffect(() => {
+    if (user) {
+      setNome((prev) => prev || user.name || "");
+      setImagePreview((prev) => prev || user.image || "");
+    }
+  }, [user]);
+
+  const { data } = useQuery({
+    queryKey: ["has-password"],
+    queryFn: async () => {
+      const res = await fetch("/api/profile/has-password");
+      if (!res.ok) throw new Error("Erro ao verificar senha");
+      return res.json();
+    },
+  });
+
+  const hasPassword = data?.hasPassword ?? false;
+  console.log("Tem Senha: " + hasPassword);
 
   const updateProfileMutation = useMutation({
     mutationFn: async () => {
@@ -65,7 +85,9 @@ const ProfilePage = () => {
         name: nome,
         image: imagePreview, // pode ser URL ou base64
         ...(currentPassword && newPassword ? { currentPassword, newPassword } : {}),
+        firstPassword: firstPassword,
       };
+      console.log(payload);
 
       const res = await fetch("/api/profile", {
         method: "PATCH",
@@ -86,6 +108,7 @@ const ProfilePage = () => {
       toast.success("Perfil atualizado com sucesso!");
       setCurrentPassword("");
       setNewPassword("");
+      console.log(data.user.image);
       setImagePreview(data.user.image ?? imagePreview);
       setNome(data.user.name ?? nome);
       setIsEditing(false);
@@ -108,6 +131,7 @@ const ProfilePage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // TODO: Verificar se senha são iguais, se sim, não permitir
     updateProfileMutation.mutate();
   };
 
@@ -172,13 +196,13 @@ const ProfilePage = () => {
                   required
                 />
               </div>
-              <div className="grid gap-2">
+              <div className="grid">
                 <div className="flex justify-between">
                   <Label htmlFor="email">Email</Label>
                   {user?.emailVerified ? (
                     <HoverCard>
                       <HoverCardTrigger asChild>
-                        <Button variant="link" className="text-green-600 font-semibold">
+                        <Button variant="link" type="button" className="text-green-600 font-semibold">
                           Email Verificado
                         </Button>
                       </HoverCardTrigger>
@@ -249,46 +273,96 @@ const ProfilePage = () => {
                   required
                 />
               </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="current-password">Senha atual</Label>
+              {hasPassword ? (
+                <>
+                  <div className="grid gap-2">
+                    <div className="flex justify-between">
+                      <Label htmlFor="current-password">Senha atual</Label>
+                      <Link
+                        href={"/authentication/esqueceu-senha"}
+                        className="text-sm font-semibold hover:underline"
+                      >
+                        Esqueceu a senha
+                      </Link>
+                    </div>
+
+                    <Input
+                      disabled={!isEditing}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="************"
+                      id="current-password"
+                      type="password"
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="new-password">Nova senha</Label>
+                    <Input
+                      disabled={!isEditing}
+                      value={newPassword}
+                      placeholder="************"
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      id="new-password"
+                      type="password"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="grid gap-2">
+                  <div className="flex justify-between">
+                    <Label htmlFor="first-password">Defina uma nova senha</Label>
+                    <HoverCard>
+                      <HoverCardTrigger asChild>
+                        <AlertCircleIcon size={16} />
+                      </HoverCardTrigger>
+                      <HoverCardContent>
+                        <div className="flex justify-between gap-4 items-center">
+                          <AlertCircleIcon size={32} />
+                          <div className="space-y-1">
+                            <h4 className="text-sm font-semibold text-yellow-600">
+                              Aviso:
+                            </h4>
+                            <p className="text-sm">
+                              Defina sua primeira senha para login com as credenciais.
+                            </p>
+                            <div className="text-muted-foreground text-xs"></div>
+                          </div>
+                        </div>
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
+                  <Input
+                    value={firstPassword}
+                    placeholder="Senha"
+                    onChange={(e) => setFirstPassword(e.target.value)}
+                    id="first-password"
+                    type="password"
+                    min={8}
+                  />
                 </div>
-                <Input
-                  disabled={!isEditing}
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  placeholder="************"
-                  id="current-password"
-                  type="password"
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="new-password">Nova senha</Label>
-                </div>
-                <Input
-                  disabled={!isEditing}
-                  value={newPassword}
-                  placeholder="************"
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  id="new-password"
-                  type="password"
-                />
-              </div>
+              )}
             </div>
           </form>
         </CardContent>
         <CardFooter className="flex-col gap-2 mb-5">
-          <Button
-            disabled={!isEditing || updateProfileMutation.status === "pending"}
-            onClick={handleSubmit}
-            className="w-full"
-          >
-            {updateProfileMutation.status === "pending"
-              ? "Salvando..."
-              : "Salvar alterações"}
-          </Button>
+          {hasPassword ? (
+            <Button
+              disabled={!isEditing || updateProfileMutation.status === "pending"}
+              onClick={handleSubmit}
+              className="w-full"
+            >
+              {updateProfileMutation.status === "pending"
+                ? "Salvando..."
+                : "Salvar alterações"}
+            </Button>
+          ) : (
+            <Button onClick={handleSubmit} className="w-full">
+              {updateProfileMutation.status === "pending"
+                ? "Salvando..."
+                : "Salvar alterações"}
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </div>

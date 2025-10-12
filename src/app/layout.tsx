@@ -10,16 +10,25 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from "./components/Providers";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <body className="antialiased">
-        <Header />
-        <Providers>
-          <NuqsAdapter>{children}</NuqsAdapter>
-        </Providers>
-        <Toaster position="top-right" closeButton />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+
+          <Providers>
+            <NuqsAdapter>{children}</NuqsAdapter>
+          </Providers>
+          <Toaster position="top-right" closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

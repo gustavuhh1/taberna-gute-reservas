@@ -11,15 +11,17 @@ export async function GET(req: NextRequest) {
   }
 
   // Verifica se o usuário tem uma conta do tipo 'credentials'
-  const credentialsAccount = await prisma.account.findFirst({
+  const credentialsAccount = await prisma.account.findMany({
     where: {
       userId: user.id,
-      providerId: "google",
     },
-    select: { id: true },
+    select: { password: true },
   });
 
-  const hasPassword = !!credentialsAccount;
+  if (!credentialsAccount || credentialsAccount.length > 1) {
+    return NextResponse.json({ hasPassword: true });
+  }
+  const hasPassword = credentialsAccount[0].password;
 
   return NextResponse.json({ hasPassword });
 }

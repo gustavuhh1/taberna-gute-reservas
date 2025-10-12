@@ -8,6 +8,7 @@ interface UpdateProfilePayload {
   image?: string;
   currentPassword?: string;
   newPassword?: string;
+  firstPassword?: string;
 }
 
 export async function PATCH(req: NextRequest) {
@@ -22,12 +23,11 @@ export async function PATCH(req: NextRequest) {
 
     const body: UpdateProfilePayload = await req.json();
 
-    const { name, image, currentPassword, newPassword } = body;
+    const { name, image, currentPassword, newPassword, firstPassword } = body;
 
     // 🔹 Verifica se imagem é base64 ou URL
     let finalImage: string | undefined;
     if (image) {
-      console.log(image)
       if (
         image.startsWith("data:image/") || // base64
         image.startsWith("http") // URL externa (ex: Google)
@@ -46,9 +46,7 @@ export async function PATCH(req: NextRequest) {
       },
     });
 
-    // 🔹 Atualiza senha via Better-auth, se enviada
     if (currentPassword && newPassword) {
-      console.log("entrou error")
       await auth.api.changePassword({
         body: {
           currentPassword,
@@ -57,8 +55,13 @@ export async function PATCH(req: NextRequest) {
         },
         headers: req.headers,
       });
-      
-
+    }
+    if(firstPassword){
+      await auth.api.setPassword({
+      body: { newPassword: "password" },
+      headers: req.headers
+    });
+      return NextResponse.json({message: "Senha nova definida com sucessod"}, {status: 201})
     }
     return NextResponse.json({ user: updatedUser });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

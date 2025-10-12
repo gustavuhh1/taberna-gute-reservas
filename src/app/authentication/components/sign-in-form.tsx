@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -107,7 +108,15 @@ const SignInForm = () => {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Senha</FormLabel>
+                    <div className="flex justify-between">
+                      <FormLabel>Senha</FormLabel>
+                      <Link
+                        href={"/authentication/esqueceu-senha"}
+                        className="text-sm font-semibold hover:underline"
+                      >
+                        Esqueceu a senha
+                      </Link>
+                    </div>
                     <FormControl>
                       <Input placeholder="Digite sua senha" type="password" {...field} />
                     </FormControl>

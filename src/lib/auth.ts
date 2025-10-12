@@ -2,6 +2,10 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 import prisma from "./prisma";
+import { Resend } from "resend";
+import EmailTemplate from "@/components/common/email-template";
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export const auth = betterAuth({
   plugins: [nextCookies()],
@@ -11,6 +15,20 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({user, url, token}, request) => {
+      const { data, error } = await resend.emails.send({
+        from: "Suporte <bounced@resend.dev>",
+        to: "delivered+password-reset@resend.dev",
+        subject: "Redefinição de senha",
+        react: EmailTemplate({ name: user.name, url }),
+      });
+      console.log(data ?? data ?? error)
+      console.log("URL: " + url)
+    },
+    onPasswordReset: async ({ user }, request) => {
+      // your logic here
+      console.log(`Password for user ${user.email} has been reset.`);
+    },
   },
 
   socialProviders: {

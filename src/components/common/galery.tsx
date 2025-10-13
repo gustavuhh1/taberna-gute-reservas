@@ -1,10 +1,6 @@
 import Image from "next/image";
 import { Card, CardContent } from "../ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "../ui/carousel";
+import { Carousel, CarouselContent, CarouselItem } from "../ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import React from "react";
 const imagensComida = [
@@ -22,7 +18,7 @@ const Galery = () => {
   return (
     <section className="py-16 px-6 max-w-screen-xl mx-auto">
       <div className="flex justify-center">
-        <h1 className="text-4xl font-titulo text-center text-gray-900 mb-12 relative inline-block after:content-[''] after:block after:h-1 after:w-16 after:bg-blue-800 after:mx-auto after:mt-2">
+        <h1 className="text-4xl font-titulo text-center text-gray-900 dark:text-white mb-12 relative inline-block after:content-[''] after:block after:h-1 after:w-16 after:bg-blue-800 after:mx-auto after:mt-2">
           Nossa Galeria
         </h1>
       </div>

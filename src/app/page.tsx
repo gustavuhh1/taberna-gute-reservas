@@ -8,13 +8,15 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Header from "@/components/common/header";
 
 export default function Home() {
   const session = authClient.useSession();
   const router = useRouter();
   return (
-    <>
+    <div>
       <div className="full-w h-full flex flex-col justify-center">
+        <Header />
         <main className="px-5 py-12 space-y-8 bg-[url('/card_navbar.png')] bg-cover bg-center inset-shadow-[320px_0px_140px_-3px_rgba(0,0,20,0.9)]">
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight font-titulo">
             Taberna do Gute
@@ -32,7 +34,9 @@ export default function Home() {
               href={session.data ? "/reservas" : "/authentication"}
               onClick={
                 session.data
-                  ? () => {router.push("/reservas")}
+                  ? () => {
+                      router.push("/reservas");
+                    }
                   : () => toast.warning("Se autentique antes de realizar uma reserva!")
               }
             >
@@ -56,6 +60,6 @@ export default function Home() {
         <Galery />
         <Footer />
       </div>
-    </>
+    </div>
   );
 }

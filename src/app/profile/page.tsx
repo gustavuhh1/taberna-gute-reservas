@@ -1,5 +1,6 @@
 "use client";
 
+import Header from "@/components/common/header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -136,6 +137,8 @@ const ProfilePage = () => {
   };
 
   return (
+  <> 
+    <Header/>
     <div className="flex flex-col space-y-10 justify-center items-center p-15">
       <h1 className="text-3xl font-semibold">Meu Perfil</h1>
       <div className="relative group">
@@ -366,6 +369,7 @@ const ProfilePage = () => {
         </CardFooter>
       </Card>
     </div>
+  </>
   );
 };
 

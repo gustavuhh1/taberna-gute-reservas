@@ -53,7 +53,7 @@ const ProfilePage = () => {
   const { data: session } = authClient.useSession();
   const user = session?.user;
 
-  const [nome, setNome] = useState(user?.name);
+  const [nome, setNome] = useState(user?.name ?? "");
   const [imagePreview, setImagePreview] = useState(user?.image ?? "");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -269,7 +269,7 @@ const ProfilePage = () => {
                 {/* CAMPO EMAIL */}
                 <Input
                   readOnly
-                  value={user?.email}
+                  value={user?.email ?? ""}
                   id="email"
                   type="email"
                   placeholder="m@example.com"

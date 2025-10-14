@@ -78,7 +78,6 @@ const ProfilePage = () => {
   });
 
   const hasPassword = data?.hasPassword ?? false;
-  console.log("Tem Senha: " + hasPassword);
 
   const updateProfileMutation = useMutation({
     mutationFn: async () => {
@@ -88,7 +87,6 @@ const ProfilePage = () => {
         ...(currentPassword && newPassword ? { currentPassword, newPassword } : {}),
         firstPassword: firstPassword,
       };
-      console.log(payload);
 
       const res = await fetch("/api/profile", {
         method: "PATCH",
@@ -109,7 +107,6 @@ const ProfilePage = () => {
       toast.success("Perfil atualizado com sucesso!");
       setCurrentPassword("");
       setNewPassword("");
-      console.log(data.user.image);
       setImagePreview(data.user.image ?? imagePreview);
       setNome(data.user.name ?? nome);
       setIsEditing(false);

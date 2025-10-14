@@ -20,8 +20,8 @@ import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import z from "zod";
@@ -29,37 +29,57 @@ import z from "zod";
 const formSchema = z.object({
   email: z.email({ error: "E-mail inválido." }),
   password: z.string("Senha inválida.").min(8, "Senha possuir pelo menos 8 caracteres."),
+  callbackUrl: z.string().optional(),
 });
-
 type FormValues = z.infer<typeof formSchema>;
+
+function safePath(path?: string) {
+  // Aceita apenas paths internos, defaults para /app
+  if (typeof path !== "string") return "/";
+  if (!path.startsWith("/")) return "/";
+  // Opcional: blacklist de rotas que não quer voltar
+  return path || "/";
+}
+
 const SignInForm = () => {
   const router = useRouter();
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false);
+
+  const initialCallback = useMemo(
+    () => safePath(searchParams?.get("callbackUrl") || undefined),
+    [searchParams]
+  );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
+      callbackUrl: initialCallback,
     },
   });
 
   const handleSignInWithGoogle = async () => {
     await authClient.signIn.social({
       provider: "google",
+      callbackURL: form.getValues("callbackUrl")
     });
   };
 
   async function onSubmit(values: FormValues) {
-    console.log(values);
     setIsLoading(true);
+    const dest = safePath(values.callbackUrl)
+
     await authClient.signIn.email({
       email: values.email,
       password: values.password,
       fetchOptions: {
         onSuccess: () => {
+          console.log(dest)
           toast.success("Login realizado com sucesso!");
-          router.push("/");
+          router.push(dest);
+          console.log("FOI")
         },
         onError: (ctx) => {
           if (ctx.error.code == "INVALID_EMAIL_OR_PASSWORD") {
@@ -90,6 +110,7 @@ const SignInForm = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="">
             <CardContent className="flex flex-col gap-5">
+              <input type="hidden" name="callbackUrl" value={form.watch("callbackUrl")} />
               <FormField
                 control={form.control}
                 name="email"

@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import prisma from "./prisma";
 import { Resend } from "resend";
 import EmailTemplate from "@/components/common/email-template";
@@ -8,10 +10,16 @@ import EmailTemplate from "@/components/common/email-template";
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export const auth = betterAuth({
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin()
+  ],
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  advanced: {
+    cookiePrefix: "taberna-gute",
+  },
 
   emailAndPassword: {
     enabled: true,
@@ -22,8 +30,6 @@ export const auth = betterAuth({
         subject: "Redefinição de senha",
         react: EmailTemplate({ name: user.name, url }),
       });
-      console.log(data ?? data ?? error)
-      console.log("URL: " + url)
     },
     onPasswordReset: async ({ user }, request) => {
       // your logic here

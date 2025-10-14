@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Faça sua reserva no taberna do gute",
 };
 
-import { Providers } from "./components/Providers";
+import { Providers } from "../components/Providers";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

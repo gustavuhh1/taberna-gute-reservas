@@ -15,7 +15,6 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await auth.api.getSession({ headers: req.headers });
     const user = session?.user;
-    console.log(user)
 
     if (!user) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
 interface SetPasswordPayload {
@@ -11,7 +10,6 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth.api.getSession({ headers: req.headers });
     const user = session?.user;
-    console.log(user);
 
     if (!user) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
@@ -30,7 +28,7 @@ export async function POST(req: NextRequest) {
       });
       console.log(data.status)
     }
-    return NextResponse.json({ user: updatedUser });
+    return NextResponse.json({ status: 200 });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
     console.error("Erro ao atualizar perfil:", err);

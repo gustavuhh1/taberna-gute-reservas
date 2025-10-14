@@ -10,13 +10,12 @@ export async function POST(req: Request) {
 
   try {
     if(token && password){
-      const data = await auth.api.resetPassword({
+      await auth.api.resetPassword({
         body: {
           newPassword: password,
           token,
         },
       });
-      console.log(data)
       return new Response("Email enviado", { status: 200 });
     }
   } catch (error) {

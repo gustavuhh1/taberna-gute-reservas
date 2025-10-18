@@ -4,7 +4,10 @@ const SESSION_COOKIE = "taberna-gute.session_token";
 
 function getAuthFromRequest(req: NextRequest) {
   const cookie = req.cookies.get(SESSION_COOKIE)?.value;
-  if (!cookie) return null;
+  if (!cookie) {
+    console.log("No session cookie found");
+    return null
+  };
   return { hasSession: true };
 }
 

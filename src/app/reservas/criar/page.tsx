@@ -66,13 +66,13 @@ export default function FormsReserva() {
   const back = () => setStep((s) => Math.max(1, s - 1));
   const resetAll = () => {
     // limpando: definir defaults (nuqs vai refletir na URL)
-    setStep(1);
-    setPessoas(2);
+    // setStep(null);
+    setPessoas(null);
     setDateTime(null);
     setData(undefined);
     setHora("");
     setNotes("");
-    setPets(false);
+    setPets(null);
   };
 
   const handleSubmit = async () => {
@@ -91,9 +91,11 @@ export default function FormsReserva() {
       toast.error("Erro ao criar reserva!");
       return;
     }
+    toast("Reserva criada com sucesso!", {
+      description: "Você pode ver suas reservas na página de reservas.",
+      action: <Button onClick={() => router.replace("/reservas")}>Ver reserva</Button>,
+    });
     setStep(5);
-    router.replace("/reservas");
-    toast.success("Reserva criada com sucesso!");
   };
 
   return (

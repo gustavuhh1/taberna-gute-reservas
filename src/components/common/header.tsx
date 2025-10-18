@@ -1,53 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { FormsReserve } from "./forms-reserve";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Button } from "../ui/button";
 import {
+  ChartBarBig,
   ClipboardClockIcon,
   LogInIcon,
   LogOutIcon,
   MenuIcon,
-  Moon,
-  Sun,
   UserRoundPenIcon,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Separator } from "../ui/separator";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useTheme } from "next-themes";
+import SelectTheme from "./select-theme";
 
 const Header = () => {
   const { data: session } = authClient.useSession();
   const router = useRouter();
-  const [sheet, setSheet] = useState(false)
-  const { setTheme } = useTheme();
-
+  const [sheet, setSheet] = useState(false);
+  const isAdmin = session?.user.role === "admin";
   return (
     <header className="flex justify-between items-center p-5 bg-indigo-950 text-white">
       <Link href={"/"}>
@@ -62,22 +38,7 @@ const Header = () => {
 
       <nav className="">
         <ul className="gap-5 flex items-center justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
-                <Sun color="#000000" className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-                <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-                <span className="sr-only">Toggle theme</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <SelectTheme />
           <Sheet open={sheet} onOpenChange={setSheet}>
             <SheetTrigger asChild={true}>
               <Button className="border-2" variant="ghost" size="icon">
@@ -137,6 +98,15 @@ const Header = () => {
                       </div>
                       <Separator />
                     </div>
+                    {isAdmin && (
+                      <div className="">
+                        <Link href={"/dashboard"} className="flex gap-5 py-3 px-2">
+                          <ChartBarBig />
+                          Dashboard
+                        </Link>
+                        <Separator />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="flex items-center justify-between">

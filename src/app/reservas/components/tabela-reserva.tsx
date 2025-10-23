@@ -24,15 +24,9 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Reserva } from "@/types/reserva";
 
-interface Reserva {
-  id: string;
-  dataReserva: Date;
-  quantidadePessoas: number;
-  possuiPet: boolean;
-  observacoes: string | null;
-  status: string;
-}
+
 
 interface Props {
   reservas: Reserva[];

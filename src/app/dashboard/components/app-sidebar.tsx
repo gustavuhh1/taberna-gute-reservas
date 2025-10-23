@@ -1,4 +1,11 @@
-import { UsersIcon, CalendarDaysIcon, Home, Settings, User2, ChevronUp } from "lucide-react";
+import {
+  UsersIcon,
+  CalendarDaysIcon,
+  Home,
+  Settings,
+  User2,
+  ChevronUp,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -14,7 +21,12 @@ import {
 } from "@/components/ui/sidebar";
 import Image from "next/image";
 import Link from "next/link";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Menu items.
 const items = [
@@ -46,13 +58,15 @@ export function AppSidebar() {
       <SidebarContent className="">
         <SidebarHeader>
           <div className="flex justify-evenly gap-2 w-full items-center pt-2">
-            <Image
-              src={"/logo.jpg"}
-              className="rounded-full"
-              width={70}
-              height={40}
-              alt="Logo Taberna Gute"
-            />
+            <Link href="/">
+              <Image
+                src={"/logo.jpg"}
+                className="rounded-full"
+                width={70}
+                height={40}
+                alt="Logo Taberna Gute"
+              />
+            </Link>
             <div>
               <h2 className="font-semibold text-xl">Taberna Gute</h2>
               <h2 className="font-semibold text-2xl">Dashboard</h2>
@@ -102,7 +116,7 @@ export function AppSidebar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
-          </SidebarMenu>    
+          </SidebarMenu>
         </SidebarFooter>
       </SidebarContent>
     </Sidebar>
